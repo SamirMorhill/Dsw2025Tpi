@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Domain.Entities
 {
-    public class Order
+    public class Order : EntityBase
     {
         public Order(DateTime date, string shippingAddress, string billingAddress, string note, decimal totalAmount)
         {
@@ -22,5 +22,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public string BillingAddress { get; set; }
         public string Note { get; set; }
         public decimal TotalAmount { get; set; }
+
+        public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
     }
 }

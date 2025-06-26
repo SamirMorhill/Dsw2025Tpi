@@ -24,6 +24,7 @@ namespace Dsw2025Tpi.Domain.Entities
             CurrentUnitPrice = price;
             StockQuantity = (int)stockQuantity;
             isActive = true;
+            productId = Guid.NewGuid();
 
         }
 
@@ -34,8 +35,9 @@ namespace Dsw2025Tpi.Domain.Entities
         public decimal CurrentUnitPrice { get; set; }
         public int StockQuantity { get; set; }
         public bool isActive { get; set; }
-       
-       
+        public Guid productId { get; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>(); //preguntar
+
 
 
 

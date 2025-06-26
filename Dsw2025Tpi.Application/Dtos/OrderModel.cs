@@ -8,5 +8,6 @@ namespace Dsw2025Tpi.Application.Dtos
 {
     internal class OrderModel
     {
+        public record Request (Guid customerId, List<OrderItemModel> items);
     }
 }
