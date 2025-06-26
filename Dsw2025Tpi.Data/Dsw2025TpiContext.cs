@@ -38,34 +38,36 @@ public class Dsw2025TpiContext : DbContext
         modelBuilder.Entity<Order>(eb =>
         {
             eb.ToTable("Order");
-            eb.Property(p => p.Date)
+            eb.Property(o => o.Date)
             .IsRequired()
             .HasColumnType("date")
             .HasDefaultValueSql("GETDATE"); //PREGUNTAR SI ESTA BIEN Y CUAL USAMOS
-            eb.Property(p => p.ShippingAddress)
+            eb.Property(o => o.ShippingAddress)
             .IsRequired()
             .HasMaxLength(100);
-            eb.Property(p => p.BillingAddress)
+            eb.Property(o => o.BillingAddress)
             .IsRequired()
             .HasMaxLength(100);
-            eb.Property(p => p.Note)
+            eb.Property(o => o.Note)
             .HasMaxLength(200);
-            eb.Property(p => p.TotalAmount)
+            eb.Property(o => o.TotalAmount)
             .IsRequired()
             .HasPrecision(15, 2);
+            eb.Property(o => o.Status)
+            .HasConversion<string>();
         });
 
 
         modelBuilder.Entity<Customer>(eb =>
         {
             eb.ToTable("Customer");
-            eb.Property(p => p.Name)
+            eb.Property(c => c.Name)
             .IsRequired()
             .HasMaxLength(60);
-            eb.Property(p => p.Email)
+            eb.Property(c => c.Email)
             .IsRequired()
             .HasMaxLength(100);
-            eb.Property(p => p.PhoneNumber)
+            eb.Property(c => c.PhoneNumber)
             .HasMaxLength(15);
         });
 

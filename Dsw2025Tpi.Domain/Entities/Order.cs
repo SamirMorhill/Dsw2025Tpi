@@ -23,6 +23,9 @@ namespace Dsw2025Tpi.Domain.Entities
         public string Note { get; set; }
         public decimal TotalAmount { get; set; }
 
+        public OrderStatus Status { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
+
+       
     }
 }
