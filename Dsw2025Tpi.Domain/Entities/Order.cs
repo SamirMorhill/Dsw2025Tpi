@@ -8,13 +8,14 @@ namespace Dsw2025Tpi.Domain.Entities
 {
     public class Order : EntityBase
     {
-        public Order(DateTime date, string shippingAddress, string billingAddress, string note, decimal totalAmount)
+        public Order(DateTime date, string shippingAddress, string billingAddress, string note, decimal totalAmount, OrderStatus status)
         {
             Date = date;
             ShippingAddress = shippingAddress;
             BillingAddress = billingAddress;
             Note = note;
             TotalAmount = totalAmount;
+            Status = status;
         }
 
         public DateTime Date { get; set; }
