@@ -11,7 +11,7 @@ namespace Dsw2025Tpi.Application.Dtos
 {
     public record OrderModel
     {
-        public record Request(
+        public record OrderRequest(
             Guid CustomerId,
             List<OrderItemModel.Request> Items,
             string ShippingAddress,
@@ -19,7 +19,7 @@ namespace Dsw2025Tpi.Application.Dtos
             string? Notes
         );
 
-        public record Response(
+        public record OrderResponse(
             Guid OrderId,
             DateTime Date,
             List<OrderItemModel.Response> Items,

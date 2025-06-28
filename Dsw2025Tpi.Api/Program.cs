@@ -2,6 +2,10 @@
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Domain;
+using Dsw2025Tpi.Application.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2025Tpi.Api;
 
@@ -21,7 +25,10 @@ public class Program
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddScoped<ProductService>();
         builder.Services.AddScoped<OrderService>();
-
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        {
+            options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025Db;Integrated Security=True;");
+        });
 
 
         var app = builder.Build();

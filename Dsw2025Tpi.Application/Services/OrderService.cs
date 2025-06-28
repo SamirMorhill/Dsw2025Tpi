@@ -24,7 +24,7 @@ namespace Dsw2025Tpi.Application.Services
             _repository = repository;
         }
 
-        public async Task<OrderModel.Response> CreateOrderAsync(OrderModel.Request request)
+        public async Task<OrderModel.OrderResponse> CreateOrderAsync(OrderModel.OrderRequest request)
         {
             var customer = await _repository.GetById<Customer>(request.CustomerId);
             if (customer == null)
@@ -38,7 +38,7 @@ namespace Dsw2025Tpi.Application.Services
             if (products.Count != productIds.Count)
                 throw new BadRequestException("One or more products not found");
 
-            // Verificar stock con LINQ
+
             var insufficientStock = request.Items
                 .Where(item =>
                 {
@@ -54,7 +54,8 @@ namespace Dsw2025Tpi.Application.Services
                 throw new BadRequestException($"Insufficient stock for: {names}");
             }
 
-            // Decrementar stock y actualizar productos
+
+
             foreach (var item in request.Items)
             {
                 var product = products.First(p => p.Id == item.ProductId);
@@ -62,31 +63,27 @@ namespace Dsw2025Tpi.Application.Services
                 await _repository.Update(product);
             }
 
-            // Crear order items
+
             var orderItems = request.Items
                 .Select(item =>
                 {
                     var product = products.First(p => p.Id == item.ProductId);
-                    return OrderItem.Create(product, item.Quantity);
-                })
+                    return new OrderItem(item.Quantity, product.CurrentUnitPrice, product);
+                }) 
                 .ToList();
 
             var order = new Order
-            {
-                Id = Guid.NewGuid(),
-                Customer = customer,
-                Date = DateTime.UtcNow,
-                ShippingAddress = request.ShippingAddress,
-                BillingAddress = request.BillingAddress,
-                Notes = request.Notes,
-                OrderItems = orderItems,
-                TotalAmount = orderItems.Sum(oi => oi.Subtotal),
-                Status = OrderStatus.PENDING
-            };
+            (
+                 DateTime.Now,
+                 request.ShippingAddress,
+                 request.BillingAddress,
+                 request.Notes,
+                 OrderStatus.Pending
+            );
 
             await _repository.Add(order);
 
-            return new OrderModel.Response(
+            return new OrderModel.OrderResponse(
                 order.Id,
                 order.Date,
                 orderItems.Select(oi =>
@@ -94,7 +91,7 @@ namespace Dsw2025Tpi.Application.Services
                         oi.ProductId,
                         oi.Quantity,
                         oi.UnitPrice,
-                        oi.Subtotal)).ToList(),
+                        oi.SubTotal)).ToList(),
                 order.TotalAmount,
                 order.Status.ToString()
             );

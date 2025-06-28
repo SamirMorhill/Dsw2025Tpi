@@ -7,7 +7,7 @@ namespace Dsw2025Tpi.Api.Controllers
 {
 
     [ApiController]
-    [Route("api/^products")]
+    [Route("/api/products")]
     public class ProductController : ControllerBase
     {
         public readonly ProductService _productService;
@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPost("/api/products")]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateModel.Request request)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateModel.ProductRequest request)
         {
             var product = await _productService.CreateProduct(request);
             return Created(); 
@@ -46,7 +46,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPut("/api/products/{id}")]
-        public async Task<IActionResult> UpdateProduct(Guid Id, [FromBody]ProductCreateModel.Request request)
+        public async Task<IActionResult> UpdateProduct(Guid Id, [FromBody]ProductCreateModel.ProductRequest request)
         {
             var product = await _productService.ProductUpdate(Id, request);
             if (product == null)

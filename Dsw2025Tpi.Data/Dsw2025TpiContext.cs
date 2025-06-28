@@ -6,7 +6,7 @@ namespace Dsw2025Tpi.Data;
 
 public class Dsw2025TpiContext : DbContext 
 {
-    
+    public DbSet<Customer> customers { get; set; }
     public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(options)
     {
     }
@@ -18,7 +18,7 @@ public class Dsw2025TpiContext : DbContext
 
         modelBuilder.Entity<Product> (eb =>
         {
-            eb.ToTable("Product");
+            eb.ToTable("Products");
             eb.Property(p => p.Sku)
             .HasMaxLength(20)
             .IsRequired();
@@ -50,12 +50,22 @@ public class Dsw2025TpiContext : DbContext
             .HasMaxLength(100);
             eb.Property(o => o.Note)
             .HasMaxLength(200);
-            eb.Property(o => o.TotalAmount)
-            .IsRequired()
-            .HasPrecision(15, 2);
             eb.Property(o => o.Status)
             .HasConversion<string>();
             eb.Ignore(p => p.TotalAmount);
+        });
+
+        modelBuilder.Entity<OrderItem>(eb =>
+        {
+            eb.ToTable("Order Item");
+            eb.Property(oi => oi.Quantity)
+            .HasDefaultValue(0);
+            eb.Property(oi => oi.UnitPrice)
+            .HasPrecision(15, 2);
+            eb.Ignore(oi => oi.SubTotal);
+            eb.Property(oi => oi.ProductId)
+            .IsRequired()
+            .HasMaxLength (100);
         });
 
 
