@@ -1,6 +1,10 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software
 ### Backend
+#### INTEGRANTES:
+1. Cristo Ochi Rocio
+2. Morhill Samir Ricardo
+3. Cabrera Navarro Tomas
 
 ## Introducción
 Se desea desarrollar una plataforma de comercio electrónico (E-commerce). 
