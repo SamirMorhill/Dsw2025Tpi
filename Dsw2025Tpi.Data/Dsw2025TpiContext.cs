@@ -6,7 +6,11 @@ namespace Dsw2025Tpi.Data;
 
 public class Dsw2025TpiContext : DbContext 
 {
-    public DbSet<Customer> customers { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+
     public Dsw2025TpiContext(DbContextOptions<Dsw2025TpiContext> options) : base(options)
     {
     }
@@ -38,10 +42,10 @@ public class Dsw2025TpiContext : DbContext
         modelBuilder.Entity<Order>(eb =>
         {
             eb.ToTable("Order");
-            eb.Property(o => o.Date)
+            /*eb.Property(o => o.Date)
             .IsRequired()
             .HasColumnType("date")
-            .HasDefaultValueSql("GETDATE"); //PREGUNTAR SI ESTA BIEN Y CUAL USAMOS
+            .HasDefaultValueSql("GETDATE"); //PREGUNTAR SI ESTA BIEN Y CUAL USAMOS*/
             eb.Property(o => o.ShippingAddress)
             .IsRequired()
             .HasMaxLength(100);
