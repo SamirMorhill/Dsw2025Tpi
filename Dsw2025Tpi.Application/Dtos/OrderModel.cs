@@ -6,12 +6,25 @@ using System.Threading.Tasks;
 
 using Dsw2025Tpi.Domain.Entities;
 
+
 namespace Dsw2025Tpi.Application.Dtos
 {
-    internal class OrderModel
+    public record OrderModel
     {
-        public record Request (Guid CustomerId, List<OrderItemModel> Items, string ShippingAddress, string BillingAddress);
+        public record Request(
+            Guid CustomerId,
+            List<OrderItemModel.Request> Items,
+            string ShippingAddress,
+            string BillingAddress,
+            string? Notes
+        );
 
-        public record Respond(DateTime Date, decimal TotalAmount, OrderStatus Status);
+        public record Response(
+            Guid OrderId,
+            DateTime Date,
+            List<OrderItemModel.Response> Items,
+            decimal TotalAmount,
+            string Status
+        );
     }
 }

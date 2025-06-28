@@ -55,6 +55,7 @@ public class Dsw2025TpiContext : DbContext
             .HasPrecision(15, 2);
             eb.Property(o => o.Status)
             .HasConversion<string>();
+            eb.Ignore(p => p.TotalAmount);
         });
 
 

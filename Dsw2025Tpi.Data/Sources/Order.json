@@ -1,0 +1,40 @@
+[
+  {
+    "customerId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "shippingAddress": "Av. Siempre Viva 742",
+    "billingAddress": "Av. Siempre Viva 742",
+    "items": [
+      {
+        "productId": "11111111-1111-1111-1111-111111111111",
+        "quantity": 2,
+        "unitPrice": 300.00
+      },
+      {
+        "productId": "33333333-3333-3333-3333-333333333333",
+        "quantity": 3,
+        "unitPrice": 120.00
+      }
+    ]
+  }
+
+
+
+  {
+    "customerId": "bbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "shippingAddress": "Pasaje Roca 4277",
+    "billingAddress": "Pasaje Roca 4277",
+    "items": [
+      {
+        "productId": "11111111-1111-1111-1111-111111111111",
+        "quantity": 2,
+        "unitPrice": 3000.00
+      },
+      {
+        "productId": "33333333-3333-3333-3333-333333333333",
+        "quantity": 3,
+        "unitPrice": 120.00
+      }
+    ]
+  }
+
+]

@@ -24,7 +24,8 @@ namespace Dsw2025Tpi.Domain.Entities
             CurrentUnitPrice = price;
             StockQuantity = (int)stockQuantity;
             IsActive = true;
-            productId = Guid.NewGuid();
+            ProductId = Guid.NewGuid();
+            
 
         }
 
@@ -35,7 +36,30 @@ namespace Dsw2025Tpi.Domain.Entities
         public decimal CurrentUnitPrice { get; set; }
         public int StockQuantity { get; set; }
         public bool IsActive { get; set; }
-        public Guid productId { get; }
+        public Guid ProductId { get; private set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
+
+        public bool HasSufficientStock(int quantity)
+        {
+            return StockQuantity >= quantity;
+        }
+
+        public void DecreaseStock(int quantity)
+        {
+            if (!HasSufficientStock(quantity))
+            {
+                throw new InvalidOperationException($"Insuficiente stock para el producto {Name}");
+            }
+            StockQuantity -= quantity;
+        }
+
+        /*public void DecrementStock (int quantity)
+        {
+            if (StockQuantity < quantity )
+            {
+                throw new Exception($"Stock insuficiente para {Name}. Stock dispnible: {StockQuantity}, solicitado: {quantity}.");
+            }
+                StockQuantity -= quantity;
+        }*/
     }
 }

@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dsw2025Tpi.Application.Dtos
+{
+    public record ProductUpdateModel
+    {
+        public record Request(string Sku, string Name, string Description, decimal Price, decimal StockQuantity);
+
+        public record Response(Guid Id, string Sku, string Name, string Description, decimal Price, decimal StockQuantity);
+    }
+}

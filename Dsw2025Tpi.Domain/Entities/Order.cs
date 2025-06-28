@@ -8,13 +8,12 @@ namespace Dsw2025Tpi.Domain.Entities
 {
     public class Order : EntityBase
     {
-        public Order(DateTime date, string shippingAddress, string billingAddress, string note, decimal totalAmount, OrderStatus status)
+        public Order(DateTime date, string shippingAddress, string billingAddress, string note, OrderStatus status)
         {
-            Date = date;
+            Date = DateTime.Now;
             ShippingAddress = shippingAddress;
             BillingAddress = billingAddress;
             Note = note;
-            TotalAmount = totalAmount;
             Status = status;
         }
 
@@ -22,11 +21,17 @@ namespace Dsw2025Tpi.Domain.Entities
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }
         public string Note { get; set; }
-        public decimal TotalAmount { get; set; }
-
+        public decimal TotalAmount => OrderItems.Sum(oi => oi.SubTotal);
         public OrderStatus Status { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
 
-       
+        public void ValidateItems()
+        {
+            if (OrderItems == null || !OrderItems.Any())
+            {
+                throw new Exception("No se puede crear una order sin items");
+            }
+                
+        }
     }
 }

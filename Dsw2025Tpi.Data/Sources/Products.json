@@ -1,0 +1,37 @@
+[
+  {
+    "sku": "COCA1L",
+    "internalCode": "CC-001",
+    "name": "Coca Cola 1L",
+    "description": "Botella de Coca Cola de 1 litro.",
+    "currentUnitPrice": 3000.00,
+    "stockQuantity": 100
+  }
+
+  {
+    "sku": "LAYSCH",
+    "internalCode": "LY-001",
+    "name": "Lays Clásicas",
+    "description": "Papas fritas Lays sabor clásico.",
+    "currentUnitPrice": 150.00,
+    "stockQuantity": 180
+  }
+
+  {
+    "sku": "COCA1L",
+    "internalCode": "CC-001",
+    "name": "Coca Cola 1L",
+    "description": "Botella de Coca Cola de 1 litro.",
+    "currentUnitPrice": 4000.00,
+    "stockQuantity": 100
+  }
+
+
+
+
+]
+
+
+
+
+
