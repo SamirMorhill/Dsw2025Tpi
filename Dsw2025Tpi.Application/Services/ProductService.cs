@@ -47,7 +47,6 @@ namespace Dsw2025Tpi.Application.Services
                         request.StockQuantity);
 
             await _repository.Add(product);
-
             return new ProductCreateModel.ProductResponse(
                 product.Id,
                 product.Sku,
@@ -57,7 +56,16 @@ namespace Dsw2025Tpi.Application.Services
                 product.StockQuantity);
         }
 
+        public async Task<List<Product>?> GetAllProducts()
+        {
+            if (_repository is null)
+            {
+                throw new ArgumentNullException("No hay productos en la base de datos.");
+            }
+            var products = await _repository.GetAll<Product>();
 
+            return products?.ToList();
+        }
 
     }
 }

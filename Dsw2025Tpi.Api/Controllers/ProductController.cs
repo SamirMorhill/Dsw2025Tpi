@@ -1,5 +1,6 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers
@@ -29,7 +30,7 @@ namespace Dsw2025Tpi.Api.Controllers
                 return BadRequest("Error al crear el producto.");
             }
 
-            return Created();
+            return Created($"/api/products/{product.Id}", product);
         }
 
 
