@@ -2,11 +2,16 @@
 
 namespace Dsw2025Tpi.Api.Controllers
 {
+
+    [ApiController]
+    [Route("/api/products")]
     public class ProductController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+
+        [HttpPost("api/product/")]
+
+
+
+
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Domain.Entities
 {
-    public class Product
+    public class Product : EntityBase
     {
         public Product()
         {
@@ -22,7 +22,7 @@ namespace Dsw2025Tpi.Domain.Entities
             CurrentUnitPrice = price;
             StockQuantity = (int)stockQuantity;
             IsActive = true;
-            ProductId = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
 
         public string? Sku { get; set; }
@@ -32,7 +32,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public decimal CurrentUnitPrice { get; set; }
         public int StockQuantity { get; set; }
         public bool IsActive { get; set; }
-        public Guid ProductId { get; private set; }
+        public Guid Id { get; private set; }
         //public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
 
 
