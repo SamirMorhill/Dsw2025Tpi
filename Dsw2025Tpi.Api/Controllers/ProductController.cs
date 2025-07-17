@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers
 {
@@ -7,9 +9,28 @@ namespace Dsw2025Tpi.Api.Controllers
     [Route("/api/products")]
     public class ProductController : Controller
     {
+        private readonly ProductService _productService;
 
-        [HttpPost("api/product/")]
+        public ProductController(ProductService productService)
+        {
+            _productService = productService;
 
+        }
+        
+
+            [HttpPost("api/product/")]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateModel.ProductRequest request)
+        {
+            
+            var product = await _productService.CreateProduct(request);
+
+            if (product is null)
+            {
+                return BadRequest("Error al crear el producto.");
+            }
+
+            return Created();
+        }
 
 
 
