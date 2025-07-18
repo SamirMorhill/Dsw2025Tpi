@@ -1,4 +1,8 @@
 
+using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Interfaces;
+
 namespace Dsw2025Tpi.Api;
 
 public class Program
@@ -14,6 +18,8 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
+        builder.Services.AddScoped<IRepository, EfRepository>();
+        builder.Services.AddTransient<ProductService>();
 
         var app = builder.Build();
 

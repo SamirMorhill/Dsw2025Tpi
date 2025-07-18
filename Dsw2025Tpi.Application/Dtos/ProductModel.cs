@@ -15,7 +15,7 @@ namespace Dsw2025Tpi.Application.Dtos
             decimal CurrentUnitPrice, 
             decimal StockQuantity);
 
-
+        
         public record ProductResponse(Guid Id,
             string Sku, 
             string Name, 

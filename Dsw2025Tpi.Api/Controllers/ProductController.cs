@@ -17,12 +17,12 @@ namespace Dsw2025Tpi.Api.Controllers
             _productService = productService;
 
         }
-        
+
 
         [HttpPost("api/product/")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
-            
+
             var product = await _productService.CreateProduct(request);
 
             if (product is null)
@@ -57,7 +57,23 @@ namespace Dsw2025Tpi.Api.Controllers
             return Ok(product);
         }
 
+        [HttpPut("/api/products/{id}")]
+        public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.ProductRequest request)
+        {
+            try
+            {
+                var updatedProduct = await _productService.UpdateProduct(id, request);
+
+                return Ok(updatedProduct);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al actualizar el producto: {ex.Message}");
+
+            }
 
 
+        }
     }
 }
