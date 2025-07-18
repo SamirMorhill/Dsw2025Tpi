@@ -23,39 +23,64 @@ namespace Dsw2025Tpi.Api.Controllers
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
 
-            var product = await _productService.CreateProduct(request);
-
-            if (product is null)
+            try
             {
-                return BadRequest("Error al crear el producto.");
+                var product = await _productService.CreateProduct(request);
+
+                return Created($"/api/products/{product.Id}", product);
+
+            } catch (Exception ex)
+            {
+                return BadRequest($"Error al crear el producto: {ex.Message}");
             }
 
-            return Created($"/api/products/{product.Id}", product);
+
+
+            
         }
 
         [HttpGet("/api/products")]
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _productService.GetAllProducts();
 
-            if (products is null || !products.Any())
+            try
             {
-                return NotFound("No hay productos disponibles.");
-            }
+                var products = await _productService.GetAllProducts();
 
-            return Ok(products);
+                if (products is null || !products.Any())
+                {
+                    return NotFound("No hay productos disponibles.");
+                }
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al obtener los productos: {ex.Message}");
+            }
         }
+
 
         [HttpGet("/api/products/{id}")]
         public async Task<IActionResult> GetProductById(Guid id)
         {
-            var product = await _productService.GetProductById(id);
-            if (product is null)
+
+            try
             {
-                return NotFound("Producto no encontrado.");
+                var product = await _productService.GetProductById(id);
+                if (product is null)
+                {
+                    return NotFound("Producto no encontrado.");
+                }
+                return Ok(product);
             }
-            return Ok(product);
+            catch (Exception ex)
+            {
+                return NotFound($"Error al obtener el producto: {ex.Message}");
+
+            }
         }
+
 
         [HttpPut("/api/products/{id}")]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel.ProductRequest request)
