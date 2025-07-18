@@ -17,7 +17,7 @@ namespace Dsw2025Tpi.Application.Services
             _repository = repository;
         }
 
-        public async Task<ProductCreateModel.ProductResponse> CreateProduct(ProductCreateModel.ProductRequest request)
+        public async Task<ProductModel.ProductResponse> CreateProduct(ProductModel.ProductRequest request)
         {
             var productExists = await _repository.First<Product>(p => p.Sku == request.Sku);
 
@@ -47,7 +47,7 @@ namespace Dsw2025Tpi.Application.Services
                         request.StockQuantity);
 
             await _repository.Add(product);
-            return new ProductCreateModel.ProductResponse(
+            return new ProductModel.ProductResponse(
                 product.Id,
                 product.Sku,
                 product.Name,
@@ -66,6 +66,26 @@ namespace Dsw2025Tpi.Application.Services
 
             return products?.ToList();
         }
+
+        public async Task<ProductModel.ProductResponse?> GetProductById(Guid id)
+        {
+            if (id == Guid.Empty || _repository is null)
+            {
+                throw new ArgumentException("No hay un producto con el Id proporcionado.");
+            }
+
+            var product = await _repository.GetById<Product>(id);
+
+            return new ProductModel.ProductResponse(product.Id,
+                product.Sku,
+                product.Name, 
+                product.Description,
+                product.CurrentUnitPrice,
+                product.StockQuantity);
+        }
+
+
+
 
     }
 }

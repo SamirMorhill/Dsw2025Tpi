@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Dtos
 {
-    public record class ProductCreateModel
+    public record class ProductModel
     {
         public record ProductRequest(string Sku, 
             string InternalCode,

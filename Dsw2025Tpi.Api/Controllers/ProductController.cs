@@ -19,8 +19,8 @@ namespace Dsw2025Tpi.Api.Controllers
         }
         
 
-            [HttpPost("api/product/")]
-        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateModel.ProductRequest request)
+        [HttpPost("api/product/")]
+        public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
             
             var product = await _productService.CreateProduct(request);
@@ -31,6 +31,30 @@ namespace Dsw2025Tpi.Api.Controllers
             }
 
             return Created($"/api/products/{product.Id}", product);
+        }
+
+        [HttpGet("/api/products")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            var products = await _productService.GetAllProducts();
+
+            if (products is null || !products.Any())
+            {
+                return NotFound("No hay productos disponibles.");
+            }
+
+            return Ok(products);
+        }
+
+        [HttpGet("/api/products/{id}")]
+        public async Task<IActionResult> GetProductById(Guid id)
+        {
+            var product = await _productService.GetProductById(id);
+            if (product is null)
+            {
+                return NotFound("Producto no encontrado.");
+            }
+            return Ok(product);
         }
 
 
