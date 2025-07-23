@@ -1,5 +1,6 @@
 ﻿using Dsw2025Tpi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dsw2025Tpi.Data;
 
