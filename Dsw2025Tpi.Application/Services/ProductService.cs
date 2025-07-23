@@ -117,9 +117,28 @@ namespace Dsw2025Tpi.Application.Services
                 productUpdate.Description,
                 productUpdate.CurrentUnitPrice,
                 productUpdate.StockQuantity);
+
         }
 
-        
+        public async Task<ProductDisabledModel.ProductDisabledResponse?> DisabledProduct(Guid id, ProductDisabledModel.ProductDisabledRequest request)
+        {
+
+            var product = await _repository.GetById<Product>(id);
+
+            if(product is null)
+            {
+                throw new NotFoundException("There isn't a product with the povided ID.");
+            }
+
+            product.IsActive = request.IsActive;
+
+            var stateUpdate = await _repository.Update(product);
+
+            return new ProductDisabledModel.ProductDisabledResponse(
+                stateUpdate.Id,
+                stateUpdate.IsActive);
+
+        }
 
         
 
