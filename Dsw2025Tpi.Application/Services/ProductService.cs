@@ -37,8 +37,6 @@ namespace Dsw2025Tpi.Application.Services
                 throw new BadRequestException("The stock product can't be negative.");
             }
 
-
-
             var product = new Product(
                         request.Sku,
                         request.InternalCode,
@@ -50,9 +48,9 @@ namespace Dsw2025Tpi.Application.Services
             await _repository.Add(product);
             return new ProductModel.ProductResponse(
                 product.Id,
-                product.Sku,
-                product.Name,
-                product.Description,
+                product.Sku!,
+                product.Name!,
+                product.Description!,
                 product.CurrentUnitPrice,
                 product.StockQuantity);
         }
@@ -77,10 +75,16 @@ namespace Dsw2025Tpi.Application.Services
 
             var product = await _repository.GetById<Product>(id);
 
-            return new ProductModel.ProductResponse(product.Id,
-                product.Sku,
-                product.Name, 
-                product.Description,
+            if (product is null)
+            {
+                throw new NotFoundException("There isn't a product with the povided ID.");
+            }
+
+            return new ProductModel.ProductResponse(
+                product.Id,
+                product.Sku!,
+                product.Name!, 
+                product.Description!,
                 product.CurrentUnitPrice,
                 product.StockQuantity);
         }
@@ -112,9 +116,9 @@ namespace Dsw2025Tpi.Application.Services
 
             return new ProductModel.ProductResponse(
                 productUpdate.Id,
-                productUpdate.Sku,
-                productUpdate.Name,
-                productUpdate.Description,
+                productUpdate.Sku!,
+                productUpdate.Name!,
+                productUpdate.Description!,
                 productUpdate.CurrentUnitPrice,
                 productUpdate.StockQuantity);
 
