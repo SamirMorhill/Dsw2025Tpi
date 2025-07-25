@@ -49,6 +49,7 @@ namespace Dsw2025Tpi.Application.Services
             return new ProductModel.ProductResponse(
                 product.Id,
                 product.Sku!,
+                product.InternalCode!,
                 product.Name!,
                 product.Description!,
                 product.CurrentUnitPrice,
@@ -83,10 +84,12 @@ namespace Dsw2025Tpi.Application.Services
             return new ProductModel.ProductResponse(
                 product.Id,
                 product.Sku!,
+                product.InternalCode!,
                 product.Name!, 
                 product.Description!,
                 product.CurrentUnitPrice,
                 product.StockQuantity);
+                product.IsActive;
         }
 
         public async Task<ProductModel.ProductResponse?> UpdateProduct(Guid id, ProductModel.ProductRequest request)

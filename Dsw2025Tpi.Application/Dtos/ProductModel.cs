@@ -13,14 +13,17 @@ namespace Dsw2025Tpi.Application.Dtos
             string Name, 
             string Description,
             decimal CurrentUnitPrice, 
-            decimal StockQuantity);
+            decimal StockQuantity,
+            bool IsActive);
 
         
         public record ProductResponse(Guid Id,
             string Sku, 
+            string InternalCode,
             string Name, 
             string Description, 
             decimal Price, 
-            decimal StockQuantity);
+            decimal StockQuantity,
+            bool IsActive);
     }
 }
