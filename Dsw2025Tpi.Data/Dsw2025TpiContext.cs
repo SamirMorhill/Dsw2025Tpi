@@ -31,6 +31,8 @@ public class Dsw2025TpiContext: DbContext
             .HasPrecision(15, 2);
             eb.Property(p => p.StockQuantity)
             .HasDefaultValue(0);
+            eb.Property(p => p.IsActive)
+            .HasDefaultValue(true);
         });
 
     }

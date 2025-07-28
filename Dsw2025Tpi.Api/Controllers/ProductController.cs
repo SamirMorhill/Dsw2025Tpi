@@ -101,7 +101,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
         }
 
-        [HttpPatch("/api/products/{id} ")]
+        [HttpPatch("/api/products/{id}")]
         public async Task<IActionResult> DisabledProduct(Guid id, [FromBody] ProductDisabledModel.ProductDisabledRequest request)
         {
 

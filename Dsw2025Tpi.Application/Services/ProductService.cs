@@ -53,7 +53,8 @@ namespace Dsw2025Tpi.Application.Services
                 product.Name!,
                 product.Description!,
                 product.CurrentUnitPrice,
-                product.StockQuantity);
+                product.StockQuantity,
+                product.IsActive);
         }
 
         public async Task<List<Product>?> GetAllProducts()
@@ -88,8 +89,9 @@ namespace Dsw2025Tpi.Application.Services
                 product.Name!, 
                 product.Description!,
                 product.CurrentUnitPrice,
-                product.StockQuantity);
-                product.IsActive;
+                product.StockQuantity,
+                product.IsActive);
+                
         }
 
         public async Task<ProductModel.ProductResponse?> UpdateProduct(Guid id, ProductModel.ProductRequest request)
@@ -108,34 +110,37 @@ namespace Dsw2025Tpi.Application.Services
 
             var product = await _repository.GetById<Product>(id);
 
-            product.Sku = request.Sku;
+            product!.Sku = request.Sku!;
             product.InternalCode = request.InternalCode;
             product.Name = request.Name;
             product.Description = request.Description;
             product.CurrentUnitPrice = request.CurrentUnitPrice;
             product.StockQuantity = (int)request.StockQuantity;
+            product.IsActive = request.IsActive;
 
             var productUpdate = await _repository.Update(product);
 
             return new ProductModel.ProductResponse(
                 productUpdate.Id,
                 productUpdate.Sku!,
+                productUpdate.InternalCode!,
                 productUpdate.Name!,
                 productUpdate.Description!,
                 productUpdate.CurrentUnitPrice,
-                productUpdate.StockQuantity);
+                productUpdate.StockQuantity,
+                productUpdate.IsActive);
 
         }
 
         public async Task<ProductDisabledModel.ProductDisabledResponse?> DisabledProduct(Guid id, ProductDisabledModel.ProductDisabledRequest request)
         {
 
-            var product = await _repository.GetById<Product>(id);
-
-            if(product is null)
+             if (id == Guid.Empty || _repository is null)
             {
-                throw new NotFoundException("There isn't a product with the povided ID.");
+                throw new NotFoundException("There is a product with the povided ID.");
             }
+
+            var product = await _repository.GetById<Product>(id);
 
             product.IsActive = request.IsActive;
 
