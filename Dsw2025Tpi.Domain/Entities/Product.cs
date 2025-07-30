@@ -33,7 +33,7 @@ namespace Dsw2025Tpi.Domain.Entities
         public int StockQuantity { get; set; }
         public bool IsActive { get; set; }
         public Guid Id { get; private set; }
-        //public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new HashSet<OrderItem>();
 
 
 

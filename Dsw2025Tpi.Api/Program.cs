@@ -28,8 +28,8 @@ public class Program
         builder.Services.AddHealthChecks();
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddTransient<ProductService>();
+        builder.Services.AddTransient<OrderService>();
 
-        
 
         var app = builder.Build();
 
