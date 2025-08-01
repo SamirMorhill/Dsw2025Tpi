@@ -39,17 +39,42 @@ namespace Dsw2025Tpi.Api.Controllers
         {
             try
             {
+                if (!string.IsNullOrWhiteSpace(status) && !Enum.TryParse<OrderStatus>(status,true,out _)) 
+                {
+                    return BadRequest($"Invalid status '{status}'.");
+                }
+                else if (pageNumber <= 0)
+                {
+                    return BadRequest("Page number must be greater than 0.");
+                }
+                else if (pageSize <= 0 || pageSize > 100)
+                {
+                    return BadRequest("Page size must be between 1 and 100.");
+                }
+
                 var orders = await _orderService.GetAllOrders(status, customer, pageNumber, pageSize);
 
-                if (orders is null)
+                if (orders is null || !orders.Items.Any())
                 {
-                    return NotFound("No hay ordenes registradas.");
+                    if (!string.IsNullOrWhiteSpace(status))
+                    {
+                        return NotFound($"There aren't orders with the status: {status}.");
+                    }
+                    else
+                    {
+                        return NotFound("There aren't orders in the system.");
+                    }
                 }
+                
                 return Ok(orders);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al obtener las ordenes: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    message = "Internal server error.",
+                    error = ex.Message
+                });
             }
         }
 

@@ -107,16 +107,19 @@ namespace Dsw2025Tpi.Application.Services
             var allOrders = await _repository.GetFiltered<Order>(o =>
                 (string.IsNullOrWhiteSpace(status) || o.Status.ToString() == status) &&
                 (!customer.HasValue || o.CustomerId == customer.Value)
-    );
+            );
 
             var total = allOrders.Count();
 
+            if (total == 0)
+                return null;
+
             var pagedOrders = allOrders
-                .OrderBy(o => o.Date) // o el criterio que prefieras
+                .OrderBy(o => o.Date) 
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(o => new OrderModel.OrderResponse(
-                         o.Id,
+                         o.OrderId,
                          o.Date,
                          o.OrderItems.Select(item => new OrderItemModel.Response(
                              item.ProductId,
@@ -131,16 +134,12 @@ namespace Dsw2025Tpi.Application.Services
                          o.Status.ToString()
                          )).ToList();
 
-
             return new PagedModel.PagedResponse<OrderModel.OrderResponse>(
                         pageNumber,
                         pageSize,
                         total,
-                         pagedOrders
+                        pagedOrders
                         );
-
-
-
         }
 
         public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)

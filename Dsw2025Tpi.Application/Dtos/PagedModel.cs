@@ -8,7 +8,6 @@ namespace Dsw2025Tpi.Application.Dtos
 {
     public record PagedModel
     {
-        public record PagedResponse<T>(int CurrentPage, int PageSize, int TotalCount, List<T> Items
-   );
+        public record PagedResponse<T>(int CurrentPage, int PageSize, int TotalCount, List<T> Items);
     }
 }
