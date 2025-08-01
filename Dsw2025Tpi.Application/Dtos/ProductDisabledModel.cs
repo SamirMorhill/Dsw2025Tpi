@@ -10,7 +10,6 @@ namespace Dsw2025Tpi.Application.Dtos
     {
         public record ProductDisabledRequest(bool IsActive);
 
-
         public record ProductDisabledResponse(Guid Id, bool IsActive);
     }
 }

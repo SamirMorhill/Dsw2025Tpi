@@ -14,13 +14,12 @@ namespace Dsw2025Tpi.Application.Services
     {
         private readonly IRepository _repository;
 
-        // Lista de clientes simulados
         private static readonly List<Guid> FakeCustomers = new()
-    {
-        Guid.Parse("a1b2c3d4-e5f6-7890-1234-567890abcdef"),
-        Guid.Parse("b2c3d4e5-f6a1-8901-2345-67890abcdef1"),
-        Guid.Parse("c3d4e5f6-a1b2-9012-3456-7890abcdef12")
-    };
+        {
+            Guid.Parse("a1b2c3d4-e5f6-7890-1234-567890abcdef"),
+            Guid.Parse("b2c3d4e5-f6a1-8901-2345-67890abcdef1"),
+            Guid.Parse("c3d4e5f6-a1b2-9012-3456-7890abcdef12")
+        };
 
         public OrderService(IRepository repository)
         {
@@ -34,7 +33,7 @@ namespace Dsw2025Tpi.Application.Services
 
             if (request.OrderItems == null || !request.OrderItems.Any())
                 throw new BadRequestException("La orden debe tener al menos un item.");
-         
+
             decimal total = 0;
             var orderItems = new List<OrderItem>();
 
@@ -44,9 +43,7 @@ namespace Dsw2025Tpi.Application.Services
                 Date = DateTime.Now,
                 ShippingAddress = request.ShippingAddress,
                 BillingAddress = request.BillingAddress,
-                Note = request.Notes ??""
-                //TotalAmount = total
-                //OrderItems = orderItems
+                Note = request.Notes ?? ""
             };
 
             await _repository.Add(order);
@@ -72,8 +69,6 @@ namespace Dsw2025Tpi.Application.Services
                     SubTotal = subTotal
                 });
 
-                //orderItems.Add(orderItem);
-
                 product.StockQuantity -= item.Quantity;
                 await _repository.Update(product);
             }
@@ -86,11 +81,73 @@ namespace Dsw2025Tpi.Application.Services
                     order.Id,
                     order.Date,
                     order.OrderItems.Select(i => new OrderItemModel.Response(
-                          i.ProductId, i.Quantity, i.UnitPrice, i.SubTotal  
+                          i.ProductId, i.Quantity, i.UnitPrice, i.SubTotal
                     )).ToList(),
                     order.TotalAmount,
                     order.Status.ToString()
             );
+        }
+
+        public async Task<List<Order>?> GetAllOrders()
+        {
+            if (_repository is null)
+            {
+                throw new NoContentException("There aren't orders in the Data Base.");
+            }
+
+            var orders = await _repository.GetAll<Order>();
+
+            return orders?.ToList();
+        }
+
+        public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
+        {
+            if(id == Guid.Empty || _repository is null)
+            {
+                throw new NotFoundException("There isn't a order with the provided ID.");
+            }
+
+            var order = await _repository.GetById<Order>(id);
+
+            if (order is null)
+            {
+                throw new NotFoundException("There isn't a order in the Data Base.");
+            }
+
+            return new OrderModel.OrderResponse(
+                    order.Id,
+                    order.Date,
+                    order.OrderItems.Select(item => new OrderItemModel.Response(
+                        item.ProductId,
+                        item.Quantity,
+                        item.UnitPrice,
+                        item.SubTotal
+                    )).ToList(),
+                    order.TotalAmount,
+                    order.Status.ToString()
+            );
+        }
+
+        public async Task<UpdateOrderStatusModel.UpdateOrderStatusResponse?> UpdateOrderStatus(Guid id, UpdateOrderStatusModel.UpdateOrderStatusRequest request)
+        {
+            if (id == Guid.Empty || _repository is null)
+            {
+                throw new NotFoundException("There isn't a order with the provided ID.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Status.ToString()))
+                throw new BadRequestException("The Status is obligatory");
+
+            var order = await _repository.GetById<Order>(id);
+
+            order.Status = request.Status;
+
+            var orderUpdate = await _repository.Update(order);
+
+            return new UpdateOrderStatusModel.UpdateOrderStatusResponse(
+                orderUpdate.Id,
+                orderUpdate.Status
+                );
         }
     }
 }

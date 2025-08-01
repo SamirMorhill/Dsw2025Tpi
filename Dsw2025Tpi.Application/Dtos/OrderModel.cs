@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +15,8 @@ namespace Dsw2025Tpi.Application.Dtos
             List<OrderItemModel.Request> OrderItems,
             string ShippingAddress,
             string BillingAddress,
-            string? Notes
+            string? Notes,
+            string Status
         );
 
         public record OrderResponse(

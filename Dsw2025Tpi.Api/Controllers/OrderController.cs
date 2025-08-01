@@ -30,5 +30,57 @@ namespace Dsw2025Tpi.Api.Controllers
                 return BadRequest($"Error al crear la orden: {ex.Message}");
             }
         }
+
+        [HttpGet("/api/orders")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            try
+            {
+                var orders = await _orderService.GetAllOrders();
+
+                if (orders is null || !orders.Any())
+                {
+                    return NotFound("No hay ordenes registradas.");
+                }
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al obtener las ordenes: {ex.Message}");
+            }
+        }
+
+        [HttpGet("/api/orders/{id}")]
+        public async Task<IActionResult> GetOrderById(Guid id)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderById(id);
+
+                if (order is null)
+                {
+                    return NotFound("Order not found.");
+                }
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return NotFound($"Mistake to find order: {ex.Message}");
+            }
+        }
+
+        [HttpPut("/api/orders/{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(Guid id, [FromBody] UpdateOrderStatusModel.UpdateOrderStatusRequest request)
+        {
+            try
+            {
+                var updateOrder = await _orderService.UpdateOrderStatus(id, request);
+                return Ok(updateOrder);
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest($"Error al actualizar la orden: {ex.Message}");
+            }
+        }
     }
 }

@@ -72,14 +72,14 @@ namespace Dsw2025Tpi.Application.Services
         {
             if (id == Guid.Empty || _repository is null)
             {
-                throw new NotFoundException("There is a product with the povided ID.");
+                throw new NotFoundException("There isn't a product with the provided ID.");
             }
 
             var product = await _repository.GetById<Product>(id);
 
             if (product is null)
             {
-                throw new NotFoundException("There isn't a product with the povided ID.");
+                throw new NotFoundException("There isn't a product in the Data Base.");
             }
 
             return new ProductModel.ProductResponse(
@@ -90,7 +90,8 @@ namespace Dsw2025Tpi.Application.Services
                 product.Description!,
                 product.CurrentUnitPrice,
                 product.StockQuantity,
-                product.IsActive);
+                product.IsActive
+            );
                 
         }
 
