@@ -46,6 +46,8 @@ namespace Dsw2025Tpi.Application.Services
                 Note = request.Notes ?? ""
             };
 
+            order.Status = OrderStatus.Pending;
+
             await _repository.Add(order);
 
             foreach (var item in request.OrderItems)
@@ -83,6 +85,9 @@ namespace Dsw2025Tpi.Application.Services
                     order.OrderItems.Select(i => new OrderItemModel.Response(
                           i.ProductId, i.Quantity, i.UnitPrice, i.SubTotal
                     )).ToList(),
+                    order.ShippingAddress,
+                    order.BillingAddress,
+                    order.Note,
                     order.TotalAmount,
                     order.Status.ToString()
             );
@@ -123,6 +128,9 @@ namespace Dsw2025Tpi.Application.Services
                         item.UnitPrice,
                         item.SubTotal
                     )).ToList(),
+                    order.ShippingAddress,
+                    order.BillingAddress,
+                    order.Note!,
                     order.TotalAmount,
                     order.Status.ToString()
             );

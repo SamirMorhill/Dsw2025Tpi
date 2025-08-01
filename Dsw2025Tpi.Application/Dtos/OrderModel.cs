@@ -15,14 +15,17 @@ namespace Dsw2025Tpi.Application.Dtos
             List<OrderItemModel.Request> OrderItems,
             string ShippingAddress,
             string BillingAddress,
-            string? Notes,
-            string Status
+            string? Notes
+            
         );
 
         public record OrderResponse(
             Guid OrderId,
             DateTime Date,
             List<OrderItemModel.Response> OrderItems,
+            string ShippingAddress,
+            string BillingAddress,
+            string Notes,
             decimal TotalAmout,
             string Status
         );
