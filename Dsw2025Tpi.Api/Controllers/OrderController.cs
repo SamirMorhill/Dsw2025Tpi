@@ -32,13 +32,16 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpGet("/api/orders")]
-        public async Task<IActionResult> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders([FromQuery] string? status,
+                 [FromQuery] Guid? customer,
+                 [FromQuery] int pageNumber = 1,
+                 [FromQuery] int pageSize = 10)
         {
             try
             {
-                var orders = await _orderService.GetAllOrders();
+                var orders = await _orderService.GetAllOrders(status, customer, pageNumber, pageSize);
 
-                if (orders is null || !orders.Any())
+                if (orders is null)
                 {
                     return NotFound("No hay ordenes registradas.");
                 }

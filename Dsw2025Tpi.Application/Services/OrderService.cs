@@ -93,16 +93,54 @@ namespace Dsw2025Tpi.Application.Services
             );
         }
 
-        public async Task<List<Order>?> GetAllOrders()
+        public async Task<PagedModel.PagedResponse<OrderModel.OrderResponse>?> GetAllOrders(
+            string? status = null,
+            Guid? customer = null,
+            int pageNumber = 1, 
+            int pageSize = 10)
         {
             if (_repository is null)
             {
                 throw new NoContentException("There aren't orders in the Data Base.");
             }
 
-            var orders = await _repository.GetAll<Order>();
+            var allOrders = await _repository.GetFiltered<Order>(o =>
+                (string.IsNullOrWhiteSpace(status) || o.Status.ToString() == status) &&
+                (!customer.HasValue || o.CustomerId == customer.Value)
+    );
 
-            return orders?.ToList();
+            var total = allOrders.Count();
+
+            var pagedOrders = allOrders
+                .OrderBy(o => o.Date) // o el criterio que prefieras
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(o => new OrderModel.OrderResponse(
+                         o.Id,
+                         o.Date,
+                         o.OrderItems.Select(item => new OrderItemModel.Response(
+                             item.ProductId,
+                             item.Quantity,
+                             item.UnitPrice,
+                             item.SubTotal
+                         )).ToList(),
+                         o.ShippingAddress,
+                         o.BillingAddress,
+                         o.Note!,
+                         o.TotalAmount,
+                         o.Status.ToString()
+                         )).ToList();
+
+
+            return new PagedModel.PagedResponse<OrderModel.OrderResponse>(
+                        pageNumber,
+                        pageSize,
+                        total,
+                         pagedOrders
+                        );
+
+
+
         }
 
         public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
