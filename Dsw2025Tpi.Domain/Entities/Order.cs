@@ -17,9 +17,10 @@ namespace Dsw2025Tpi.Domain.Entities
             BillingAddress = billingAddress;
             Note = note;
             Status = status;
+            Id = Guid.NewGuid();
         }
 
-        public Guid OrderId { get; set; }
+        public Guid Id { get; set; }
         public DateTime Date { get; set; }
         public string ShippingAddress { get; set; }
         public string BillingAddress { get; set; }

@@ -16,11 +16,10 @@ namespace Dsw2025Tpi.Application.Dtos
             string ShippingAddress,
             string BillingAddress,
             string? Notes
-            
         );
 
         public record OrderResponse(
-            Guid OrderId,
+            Guid Id,
             DateTime Date,
             List<OrderItemModel.Response> OrderItems,
             string ShippingAddress,

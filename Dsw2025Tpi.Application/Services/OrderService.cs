@@ -36,7 +36,7 @@ namespace Dsw2025Tpi.Application.Services
 
             decimal total = 0;
             var orderItems = new List<OrderItem>();
-
+            
             var order = new Order
             {
                 CustomerId = request.CustomerId,
@@ -96,7 +96,7 @@ namespace Dsw2025Tpi.Application.Services
         public async Task<PagedModel.PagedResponse<OrderModel.OrderResponse>?> GetAllOrders(
             string? status = null,
             Guid? customer = null,
-            int pageNumber = 1, 
+            int pageNumber = 1,
             int pageSize = 10)
         {
             if (_repository is null)
@@ -106,7 +106,9 @@ namespace Dsw2025Tpi.Application.Services
 
             var allOrders = await _repository.GetFiltered<Order>(o =>
                 (string.IsNullOrWhiteSpace(status) || o.Status.ToString() == status) &&
-                (!customer.HasValue || o.CustomerId == customer.Value)
+                (!customer.HasValue || o.CustomerId == customer.Value), 
+                $"{nameof(Order.OrderItems)}", 
+                $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"
             );
 
             var total = allOrders.Count();
@@ -119,18 +121,18 @@ namespace Dsw2025Tpi.Application.Services
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(o => new OrderModel.OrderResponse(
-                         o.OrderId,
+                         o.Id,
                          o.Date,
                          o.OrderItems.Select(item => new OrderItemModel.Response(
                              item.ProductId,
                              item.Quantity,
                              item.UnitPrice,
-                             item.SubTotal
+                             item.SubTotal = item.Quantity * item.UnitPrice
                          )).ToList(),
                          o.ShippingAddress,
                          o.BillingAddress,
                          o.Note!,
-                         o.TotalAmount,
+                         o.OrderItems.Sum(item => item.Quantity * item.UnitPrice),
                          o.Status.ToString()
                          )).ToList();
 

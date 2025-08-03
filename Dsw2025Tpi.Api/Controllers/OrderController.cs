@@ -23,7 +23,7 @@ namespace Dsw2025Tpi.Api.Controllers
             try
             {
                 var order = await _orderService.CreateOrderAsync(request);
-                return Created($"/api/orders/{order.OrderId}",order);
+                return Created($"/api/orders/{order.Id}",order);
             }
             catch (BadRequestException ex)
             {
