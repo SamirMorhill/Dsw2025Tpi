@@ -151,7 +151,7 @@ namespace Dsw2025Tpi.Application.Services
                 throw new NotFoundException("There isn't a order with the provided ID.");
             }
 
-            var order = await _repository.GetById<Order>(id);
+            var order = await _repository.GetById<Order>(id,nameof(Order.OrderItems),$"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}");
 
             if (order is null)
             {
@@ -165,12 +165,12 @@ namespace Dsw2025Tpi.Application.Services
                         item.ProductId,
                         item.Quantity,
                         item.UnitPrice,
-                        item.SubTotal
+                        item.SubTotal = item.Quantity * item.UnitPrice
                     )).ToList(),
                     order.ShippingAddress,
                     order.BillingAddress,
                     order.Note!,
-                    order.TotalAmount,
+                    order.OrderItems.Sum(item => item.Quantity * item.UnitPrice),
                     order.Status.ToString()
             );
         }

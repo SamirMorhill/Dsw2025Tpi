@@ -4,6 +4,8 @@ using Dsw2025Tpi.Data;
 using Dsw2025Tpi.Data.Repositories;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Dsw2025Tpi.Api;
 
@@ -30,6 +32,12 @@ public class Program
         builder.Services.AddTransient<ProductService>();
         builder.Services.AddTransient<OrderService>();
 
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                // Convierte enums a string y también permite deserializar por número
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            });
 
         var app = builder.Build();
 

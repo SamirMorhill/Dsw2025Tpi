@@ -27,7 +27,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (BadRequestException ex)
             {
-                return BadRequest($"Error al crear la orden: {ex.Message}");
+                return BadRequest($"Error creating order: {ex.Message}");
             }
         }
 
@@ -93,7 +93,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound($"Mistake to find order: {ex.Message}");
+                return NotFound($"Error finding order: {ex.Message}");
             }
         }
 
@@ -107,7 +107,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception ex) 
             {
-                return BadRequest($"Error al actualizar la orden: {ex.Message}");
+                return BadRequest($"Error updating order: {ex.Message}");
             }
         }
     }
