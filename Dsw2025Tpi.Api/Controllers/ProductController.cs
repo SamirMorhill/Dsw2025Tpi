@@ -1,12 +1,14 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers
 {
 
     [ApiController]
+    [Authorize]
     [Route("/api/products")]
     public class ProductController : Controller
     {
@@ -15,14 +17,11 @@ namespace Dsw2025Tpi.Api.Controllers
         public ProductController(ProductService productService)
         {
             _productService = productService;
-
         }
-
 
         [HttpPost("/api/products")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
-
             try
             {
                 var product = await _productService.CreateProduct(request);
@@ -32,17 +31,13 @@ namespace Dsw2025Tpi.Api.Controllers
             } catch (Exception ex)
             {
                 return BadRequest($"Error al crear el producto: {ex.Message}");
-            }
-
-
-
-            
+            } 
         }
 
         [HttpGet("/api/products")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts()
         {
-
             try
             {
                 var products = await _productService.GetAllProducts();
