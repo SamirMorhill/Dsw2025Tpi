@@ -37,7 +37,7 @@ public class Program
             o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
-                Name = "Autorization",
+                Name = "Authorization",
                 Description = "Ingresar el token",
                 Type = SecuritySchemeType.ApiKey
             });
@@ -86,9 +86,15 @@ public class Program
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtConfig["Issuer"],
-                    ValidAudience = jwtConfig["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    //ValidIssuer = jwtConfig["Issuer"],
+                    //ValidAudience = jwtConfig["Audience"],
+                    //IssuerSigningKey = new SymmetricSecurityKey(key)
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            )
+
                 };
             });
 
