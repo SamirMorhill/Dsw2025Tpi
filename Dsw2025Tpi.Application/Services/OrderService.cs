@@ -29,10 +29,10 @@ namespace Dsw2025Tpi.Application.Services
         public async Task<OrderModel.OrderResponse> CreateOrderAsync(OrderModel.OrderRequest request)
         {
             if (!FakeCustomers.Contains(request.CustomerId))
-                throw new BadRequestException("Cliente inválido o no simulado.");
+                throw new BadRequestException("Invalid or unsimulated client.");
 
             if (request.OrderItems == null || !request.OrderItems.Any())
-                throw new BadRequestException("La orden debe tener al menos un item.");
+                throw new BadRequestException("The order must have at least one item");
 
             decimal total = 0;
             var orderItems = new List<OrderItem>();
@@ -54,10 +54,10 @@ namespace Dsw2025Tpi.Application.Services
             {
                 var product = await _repository.First<Product>(p => p.Id == item.ProductId);
                 if (product == null)
-                    throw new BadRequestException($"Producto {item.ProductId} no encontrado");
+                    throw new BadRequestException($"Product {item.ProductId} not found");
 
                 if (product.StockQuantity < item.Quantity)
-                    throw new BadRequestException($"Stock insuficiente para el producto {product.Name}");
+                    throw new BadRequestException($"Insufficient stock for the product {product.Name}");
 
                 decimal subTotal = product.CurrentUnitPrice * item.Quantity;
                 total += subTotal;

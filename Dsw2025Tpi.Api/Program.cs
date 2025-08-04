@@ -86,14 +86,10 @@ public class Program
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    //ValidIssuer = jwtConfig["Issuer"],
-                    //ValidAudience = jwtConfig["Audience"],
-                    //IssuerSigningKey = new SymmetricSecurityKey(key)
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-            )
+                    ValidIssuer = jwtConfig["Issuer"],
+                    ValidAudience = jwtConfig["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    
 
                 };
             });
@@ -101,9 +97,12 @@ public class Program
         builder.Services.AddDomainServices(builder.Configuration);
         builder.Services.AddDbContext<AuthenticateContext>(options =>
         {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("AuthenticateDb"));
+        });
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+        {
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
-
         builder.Services.AddSingleton<JwtTokenService>();
         builder.Services.AddAuthorization();
         builder.Services.AddScoped<IRepository, EfRepository>();

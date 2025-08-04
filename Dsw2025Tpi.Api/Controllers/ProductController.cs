@@ -30,7 +30,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
             } catch (Exception ex)
             {
-                return BadRequest($"Error al crear el producto: {ex.Message}");
+                return BadRequest($"Error creating product: {ex.Message}");
             } 
         }
 
@@ -44,14 +44,14 @@ namespace Dsw2025Tpi.Api.Controllers
 
                 if (products is null || !products.Any())
                 {
-                    return NotFound("No hay productos disponibles.");
+                    return NotFound("There aren´t products available.");
                 }
 
                 return Ok(products);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al obtener los productos: {ex.Message}");
+                return BadRequest($"Error obtaining products: {ex.Message}");
             }
         }
 
@@ -65,13 +65,13 @@ namespace Dsw2025Tpi.Api.Controllers
                 var product = await _productService.GetProductById(id);
                 if (product is null)
                 {
-                    return NotFound("Producto no encontrado.");
+                    return NotFound("Product not found.");
                 }
                 return Ok(product);
             }
             catch (Exception ex)
             {
-                return NotFound($"Error al obtener el producto: {ex.Message}");
+                return NotFound($"Error obtaining products: {ex.Message}");
 
             }
         }
@@ -89,7 +89,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al actualizar el producto: {ex.Message}");
+                return BadRequest($"Error updating the product: {ex.Message}");
 
             }
 
@@ -109,7 +109,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error al deshabilitar el producto: {ex.Message}");
+                return BadRequest($"Error disabling the product: {ex.Message}");
             }
 
 

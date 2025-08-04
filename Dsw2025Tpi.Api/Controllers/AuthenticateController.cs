@@ -30,13 +30,13 @@ public class AuthenticateController : ControllerBase
         var user = await _userManager.FindByNameAsync(request.Username);
         if (user == null)
         {
-            return Unauthorized("Usuario o contraseña incorrectos");
+            return Unauthorized("Incorrect username or password");
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
         {
-            return Unauthorized("Usuario o contraseña incorrectos");
+            return Unauthorized("Incorrect username or password");
         }
 
         var token = _jwtTokenService.GenerateToken(request.Username);
@@ -52,6 +52,6 @@ public class AuthenticateController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
-        return Ok("Usuario registrado correctamente.");
+        return Ok("User successfully registered.");
     }
 }

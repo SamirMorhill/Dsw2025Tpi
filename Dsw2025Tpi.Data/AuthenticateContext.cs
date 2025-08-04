@@ -16,12 +16,14 @@ public class AuthenticateContext : IdentityDbContext
         : base(options)
     {
     }
-
+    public AuthenticateContext ()
+    {
+    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=.;Database=Dsw2025Dbv2;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=AuthenticateDb;Trusted_Connection=True;");
         }
     }
 
