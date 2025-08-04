@@ -46,7 +46,7 @@ namespace Dsw2025Tpi.Application.Services
         {
             var errors = new List<string>();
 
-            // Validaciones básicas
+          
             if (string.IsNullOrWhiteSpace(registerModel.Username))
                 errors.Add("Username is required.");
 
