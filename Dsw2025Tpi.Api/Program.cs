@@ -27,11 +27,16 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
+
+       
         builder.Services.AddSwaggerGen(o =>
         {
             o.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Desarrollo de Software",
+                Description = "### API para una plataforma de comercio electrónico (e-commerce)." +
+                "\n ### Integrantes: \n ### - Cristo Ochi, Rocío \n ### - Cabrera Navarro, Tomas\n ### - Morhill, Samir Ricardo",
                 Version = "v1",
             });
             o.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

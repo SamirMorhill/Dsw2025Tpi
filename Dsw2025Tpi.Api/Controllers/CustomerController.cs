@@ -20,6 +20,7 @@ namespace Dsw2025Tpi.Api.Controllers
 
         [HttpGet("/api/customers")]
         [AllowAnonymous]
+     
         public async Task<IActionResult> GetAllCustomers()
         {
             try
