@@ -108,6 +108,7 @@ public class Program
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddTransient<ProductService>();
         builder.Services.AddTransient<OrderService>();
+        builder.Services.AddTransient<AuthenticateServices>();
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>

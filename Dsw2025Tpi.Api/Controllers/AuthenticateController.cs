@@ -14,44 +14,57 @@ public class AuthenticateController : ControllerBase
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly JwtTokenService _jwtTokenService;
+    private readonly AuthenticateServices _authService;
 
     public AuthenticateController(UserManager<IdentityUser> userManager,
         SignInManager<IdentityUser> signInManager,
-        JwtTokenService jwtTokenService)
+        JwtTokenService jwtTokenService,
+        AuthenticateServices authServices)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtTokenService = jwtTokenService;
+        _authService = authServices;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel request)
     {
-        var user = await _userManager.FindByNameAsync(request.Username);
-        if (user == null)
-        {
-            return Unauthorized("Incorrect username or password");
-        }
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-        if (!result.Succeeded)
+        try
         {
-            return Unauthorized("Incorrect username or password");
-        }
+            var token = await _authService.LoginUser(request);
 
-        var token = _jwtTokenService.GenerateToken(request.Username);
-        return Ok(new { token });
+            if (token == null)
+                return Unauthorized("Invalid username or password.");
+
+            return Ok(new { token });
+        }
+        catch (Exception ex)
+        {
+            
+            return StatusCode(500, $"An error occurred while logging in: {ex.Message}");
+        }
+        
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
     {
-        var user = new IdentityUser { UserName = model.Username};
-        var result = await _userManager.CreateAsync(user, model.Password);
+        try
+        {
+            var (succeeded, errors) = await _authService.RegisterUser(registerModel);
 
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
+            if (!succeeded)
+                return BadRequest(new { errors });
 
-        return Ok("User successfully registered.");
+            return Ok("User successfully registered.");
+        }
+        catch (Exception ex)
+        {
+            
+            return StatusCode(500, $"An error occurred while registering the user: {ex.Message}");
+        }
+
     }
 }
