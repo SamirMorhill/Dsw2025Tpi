@@ -35,7 +35,7 @@ namespace Dsw2025Tpi.Application.Services
             }
 
             var result = customers.Select(c => new CustomerModel.Response(
-                c.Id,
+                c.CustomerId,
                 c.Name!,
                 c.Email!,
                 c.PhoneNumber!

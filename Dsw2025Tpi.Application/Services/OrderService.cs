@@ -103,7 +103,7 @@ namespace Dsw2025Tpi.Application.Services
             {
                 throw new NoContentException("There aren't orders in the Data Base.");
             }
-
+            //  QUEDAMOS AQUI
             var allOrders = await _repository.GetFiltered<Order>(o =>
                 (string.IsNullOrWhiteSpace(status) || o.Status.ToString() == status) &&
                 (!customer.HasValue || o.CustomerId == customer.Value), 

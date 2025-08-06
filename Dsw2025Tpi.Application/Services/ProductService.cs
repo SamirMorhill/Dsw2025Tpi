@@ -56,7 +56,7 @@ namespace Dsw2025Tpi.Application.Services
                 product.StockQuantity,
                 product.IsActive);
         }
-
+         
         public async Task<List<ProductModel.ProductResponse>?> GetAllProducts()
         {
             if (_repository is null)
@@ -151,7 +151,7 @@ namespace Dsw2025Tpi.Application.Services
 
              if (id == Guid.Empty || _repository is null)
             {
-                throw new NotFoundException("There is a product with the povided ID.");
+                throw new NotFoundException("There isn´t a product with the povided ID.");
             }
 
             var product = await _repository.GetById<Product>(id);
