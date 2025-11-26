@@ -21,7 +21,17 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+        //habilitar CORS
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy( "AllowFrontend", builder=>
+            {
+                builder.WithOrigins("http://localhost:5173") // URL del frontend
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+            });
+        });
         // Add services to the container.
 
         builder.Services.AddControllers();
@@ -130,7 +140,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
-        
+        app.UseCors("AllowFrontend");
+
         app.MapHealthChecks("/healthcheck");
 
         app.Run();
