@@ -11,7 +11,8 @@ namespace Dsw2025Tpi.Application.Dtos
     public record OrderModel
     {
         public record OrderRequest(
-            Guid CustomerId,
+            Guid? CustomerId,
+            string? UserName,
             List<OrderItemModel.Request> OrderItems,
             string ShippingAddress,
             string BillingAddress,
@@ -26,7 +27,8 @@ namespace Dsw2025Tpi.Application.Dtos
             string BillingAddress,
             string Notes,
             decimal TotalAmout,
-            string Status
+            string Status,
+            string CustomerName
         );
     }
 }

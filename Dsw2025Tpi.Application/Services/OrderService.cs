@@ -14,13 +14,6 @@ namespace Dsw2025Tpi.Application.Services
     {
         private readonly IRepository _repository;
 
-        private static readonly List<Guid> FakeCustomers = new()
-        {
-            Guid.Parse("a1b2c3d4-e5f6-7890-1234-567890abcdef"),
-            Guid.Parse("b2c3d4e5-f6a1-8901-2345-67890abcdef1"),
-            Guid.Parse("c3d4e5f6-a1b2-9012-3456-7890abcdef12")
-        };
-
         public OrderService(IRepository repository)
         {
             _repository = repository;
@@ -28,18 +21,38 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<OrderModel.OrderResponse> CreateOrderAsync(OrderModel.OrderRequest request)
         {
-            if (!FakeCustomers.Contains(request.CustomerId))
-                throw new BadRequestException("Invalid or unsimulated client.");
+            Guid finalCustomerId;
+            Customer? user = null;
 
-            if (request.OrderItems == null || !request.OrderItems.Any())
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                user = await _repository.First<Customer>(u => u.Name == request.UserName);
+
+                if (user == null)
+                    throw new BadRequestException($"El usuario '{request.UserName}' no existe en la base de datos");
+
+                finalCustomerId = user.CustomerId;
+            }
+            else if (request.CustomerId.HasValue)
+            {
+                finalCustomerId = request.CustomerId.Value;
+                user = await _repository.First<Customer>(u => u.CustomerId == finalCustomerId);
+            }
+            else
+            {
+                throw new BadRequestException ("No se pudo identificar al cliente.");
+            }
+                if (request.OrderItems == null || !request.OrderItems.Any())
                 throw new BadRequestException("The order must have at least one item");
 
             decimal total = 0;
             var orderItems = new List<OrderItem>();
-            
+
+            var productNames = new Dictionary<Guid, string>();
+
             var order = new Order
             {
-                CustomerId = request.CustomerId,
+                CustomerId = finalCustomerId,
                 Date = DateTime.Now,
                 ShippingAddress = request.ShippingAddress,
                 BillingAddress = request.BillingAddress,
@@ -58,6 +71,8 @@ namespace Dsw2025Tpi.Application.Services
 
                 if (product.StockQuantity < item.Quantity)
                     throw new BadRequestException($"Insufficient stock for the product {product.Name}");
+
+                productNames[product.Id] = product.Name;
 
                 decimal subTotal = product.CurrentUnitPrice * item.Quantity;
                 total += subTotal;
@@ -79,21 +94,29 @@ namespace Dsw2025Tpi.Application.Services
             order.OrderItems = orderItems;
             await _repository.Update(order);
 
+            string customerName = user != null ? user.Name : "Cliente (Nombre no disponible)";
+
             return new OrderModel.OrderResponse(
                     order.Id,
                     order.Date,
                     order.OrderItems.Select(i => new OrderItemModel.Response(
-                          i.ProductId, i.Quantity, i.UnitPrice, i.SubTotal
+                          i.ProductId, 
+                          productNames.ContainsKey(i.ProductId) ? productNames[i.ProductId] : "Producto", 
+                          i.Quantity, 
+                          i.UnitPrice, 
+                          i.SubTotal
                     )).ToList(),
                     order.ShippingAddress,
                     order.BillingAddress,
                     order.Note,
                     order.TotalAmount,
-                    order.Status.ToString()
+                    order.Status.ToString(),
+                    order.Customer != null ? order.Customer.Name : "Cliente Simulado"
             );
         }
 
         public async Task<PagedModel.PagedResponse<OrderModel.OrderResponse>?> GetAllOrders(
+            string? search,
             string? status = null,
             Guid? customer = null,
             int pageNumber = 1,
@@ -103,12 +126,53 @@ namespace Dsw2025Tpi.Application.Services
             {
                 throw new NoContentException("There aren't orders in the Data Base.");
             }
-            //  QUEDAMOS AQUI
+
+            // Normalizamos el texto de búsqueda
+            var normalizedSearch = string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+
             var allOrders = await _repository.GetFiltered<Order>(o =>
+                // 1) Filtro por estado (sigue igual)
                 (string.IsNullOrWhiteSpace(status) || o.Status.ToString() == status) &&
-                (!customer.HasValue || o.CustomerId == customer.Value), 
-                $"{nameof(Order.OrderItems)}", 
-                $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}"
+
+                // 2) Filtro por cliente específico (sigue igual)
+                (!customer.HasValue || o.CustomerId == customer.Value) &&
+
+                // 3) Filtro de búsqueda general (por todo MENOS estado)
+                (
+                    normalizedSearch == null ||                     // si no hay search, no filtra
+                                                                    // Id de la orden
+                    o.Id.ToString().ToLower().Contains(normalizedSearch) ||
+
+                    // Nombre del cliente
+                    (o.Customer != null &&
+                     o.Customer.Name != null &&
+                     o.Customer.Name.ToLower().Contains(normalizedSearch)) ||
+
+                    // Direcciones
+                    (!string.IsNullOrEmpty(o.ShippingAddress) &&
+                     o.ShippingAddress.ToLower().Contains(normalizedSearch)) ||
+
+                    (!string.IsNullOrEmpty(o.BillingAddress) &&
+                     o.BillingAddress.ToLower().Contains(normalizedSearch)) ||
+
+                    // Nota de la orden
+                    (!string.IsNullOrEmpty(o.Note) &&
+                     o.Note.ToLower().Contains(normalizedSearch)) ||
+
+                    // Productos de la orden: nombre o SKU
+                    o.OrderItems.Any(item =>
+                        item.Product != null && (
+                            (!string.IsNullOrEmpty(item.Product.Name) &&
+                             item.Product.Name.ToLower().Contains(normalizedSearch)) ||
+                            (!string.IsNullOrEmpty(item.Product.Sku) &&
+                             item.Product.Sku.ToLower().Contains(normalizedSearch))
+                        ))
+                ),
+                $"{nameof(Order.OrderItems)}",
+                $"{nameof(Order.OrderItems)}.{nameof(OrderItem.Product)}",
+                $"{nameof(Order.Customer)}"
             );
 
             var total = allOrders.Count();
@@ -117,31 +181,34 @@ namespace Dsw2025Tpi.Application.Services
                 return null;
 
             var pagedOrders = allOrders
-                .OrderBy(o => o.Date) 
+                .OrderBy(o => o.Date)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .Select(o => new OrderModel.OrderResponse(
-                         o.Id,
-                         o.Date,
-                         o.OrderItems.Select(item => new OrderItemModel.Response(
-                             item.ProductId,
-                             item.Quantity,
-                             item.UnitPrice,
-                             item.SubTotal = item.Quantity * item.UnitPrice
-                         )).ToList(),
-                         o.ShippingAddress,
-                         o.BillingAddress,
-                         o.Note!,
-                         o.OrderItems.Sum(item => item.Quantity * item.UnitPrice),
-                         o.Status.ToString()
-                         )).ToList();
+                    o.Id,
+                    o.Date,
+                    o.OrderItems.Select(item => new OrderItemModel.Response(
+                        item.ProductId,
+                        item.Product.Name,
+                        item.Quantity,
+                        item.UnitPrice,
+                        item.SubTotal = item.Quantity * item.UnitPrice
+                    )).ToList(),
+                    o.ShippingAddress ?? "Sin dirección.",
+                    o.BillingAddress ?? "Sin dirección.",
+                    o.Note!,
+                    o.OrderItems.Sum(item => item.Quantity * item.UnitPrice),
+                    o.Status.ToString(),
+                    o.Customer != null ? o.Customer.Name : "Cliente Simulado"
+                ))
+                .ToList();
 
             return new PagedModel.PagedResponse<OrderModel.OrderResponse>(
-                        pageNumber,
-                        pageSize,
-                        total,
-                        pagedOrders
-                        );
+                pageNumber,
+                pageSize,
+                total,
+                pagedOrders
+        );
         }
 
         public async Task<OrderModel.OrderResponse?> GetOrderById(Guid id)
@@ -163,6 +230,7 @@ namespace Dsw2025Tpi.Application.Services
                     order.Date,
                     order.OrderItems.Select(item => new OrderItemModel.Response(
                         item.ProductId,
+                        item.Product.Name,
                         item.Quantity,
                         item.UnitPrice,
                         item.SubTotal = item.Quantity * item.UnitPrice
@@ -171,7 +239,8 @@ namespace Dsw2025Tpi.Application.Services
                     order.BillingAddress,
                     order.Note!,
                     order.OrderItems.Sum(item => item.Quantity * item.UnitPrice),
-                    order.Status.ToString()
+                    order.Status.ToString(),
+                    order.Customer != null ? order.Customer.Name : "Cliente Simulado"
             );
         }
 

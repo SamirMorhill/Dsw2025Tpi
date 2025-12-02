@@ -11,8 +11,8 @@ namespace Dsw2025Ej15.Api.Controllers;
 [Route("api/auth")]
 public class AuthenticateController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager; 
+    private readonly SignInManager<IdentityUser> _signInManager; 
     private readonly JwtTokenService _jwtTokenService;
     private readonly AuthenticateServices _authService;
 

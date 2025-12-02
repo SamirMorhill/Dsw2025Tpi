@@ -15,6 +15,7 @@ namespace Dsw2025Tpi.Application.Dtos
 
         public record Response(
             Guid ProductId,
+            string ProductName,
             int Quantity,
             decimal UnitPrice,
             decimal SubTotal

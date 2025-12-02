@@ -4,6 +4,7 @@ using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.EntityFrameworkCore.Storage.Json;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Tpi.Api.Controllers
@@ -20,11 +21,22 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPost("/api/orders")]
+        [Authorize]
         public async Task<IActionResult> CreateOrder([FromBody] OrderModel.OrderRequest request)
         {
             try
             {
-                var order = await _orderService.CreateOrderAsync(request);
+                var claimValue = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(claimValue))
+                    return Unauthorized("Usuario no identificado en el token.");
+
+                var newRequest = request with
+                {
+                    UserName = claimValue,
+                    CustomerId = null
+                };
+
+                var order = await _orderService.CreateOrderAsync(newRequest);
                 return Created($"/api/orders/{order.Id}",order);
             }
             catch (BadRequestException ex)
@@ -34,14 +46,16 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpGet("/api/orders")]
-        public async Task<IActionResult> GetAllOrders([FromQuery] string? status,
-                 [FromQuery] Guid? customer,
-                 [FromQuery] int pageNumber = 1,
-                 [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllOrders(
+            [FromQuery] string? search,
+            [FromQuery] string? status,
+            [FromQuery] Guid? customer,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(status) && !Enum.TryParse<OrderStatus>(status,true,out _)) 
+                if (!string.IsNullOrWhiteSpace(status) && !Enum.TryParse<OrderStatus>(status, true, out _))
                 {
                     return BadRequest($"Invalid status '{status}'.");
                 }
@@ -54,7 +68,7 @@ namespace Dsw2025Tpi.Api.Controllers
                     return BadRequest("Page size must be between 1 and 100.");
                 }
 
-                var orders = await _orderService.GetAllOrders(status, customer, pageNumber, pageSize);
+                var orders = await _orderService.GetAllOrders(search, status, customer, pageNumber, pageSize);
 
                 if (orders is null || !orders.Items.Any())
                 {
@@ -62,12 +76,16 @@ namespace Dsw2025Tpi.Api.Controllers
                     {
                         return NotFound($"There aren't orders with the status: {status}.");
                     }
+                    else if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        return NotFound($"There aren't orders that match the search: '{search}'.");
+                    }
                     else
                     {
                         return NotFound("There aren't orders in the system.");
                     }
                 }
-                
+
                 return Ok(orders);
             }
             catch (Exception ex)

@@ -16,8 +16,8 @@ namespace Dsw2025Tpi.Application.Dtos
 
         public record Response (
             Guid CustomerId,
-            string Name, 
-            string Email,
+            string Name,
+            string Email, 
             string PhoneNumber
         );
     }

@@ -29,10 +29,10 @@ namespace Dsw2025Tpi.Application.Services
             } else if (string.IsNullOrWhiteSpace(request.Name))
             {
                 throw new BadRequestException("The product name can´t be null or empty.");
-            }else if (request.CurrentUnitPrice <= 0)
+            } else if (request.CurrentUnitPrice <= 0)
             {
                 throw new BadRequestException("The product price must be greater than zero.");
-            }else if ( request.StockQuantity < 0)
+            } else if (request.StockQuantity < 0)
             {
                 throw new BadRequestException("The stock product can't be negative.");
             }
@@ -56,29 +56,53 @@ namespace Dsw2025Tpi.Application.Services
                 product.StockQuantity,
                 product.IsActive);
         }
-         
-        public async Task<List<ProductModel.ProductResponse>?> GetAllProducts()
+
+        public async Task<PagedModel.PagedResponse<ProductModel.ProductResponse>?> GetAllProducts(
+            string? search,
+            int pageNumber = 1,
+            int pageSize = 10)
         {
             if (_repository is null)
             {
                 throw new NoContentException("There aren´t products in the Data Base.");
             }
+
             var products = await _repository.GetAll<Product>();
 
-            var result = products?.Select(p => new ProductModel.ProductResponse(
-                 p.Id,
-                 p.Sku,
-                 p.InternalCode,
-                 p.Name,
-                 p.Description,
-                 p.CurrentUnitPrice,
-                 p.StockQuantity,
-                 p.IsActive
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower().Trim();
+                products = products
+                    .Where(p => p.Name.ToLower().Contains(search))
+                    .ToList();
+            }
+
+            var total = products.Count();
+
+            if (total == 0)
+                return null;
+
+            var pagedProducts = products
+                .OrderBy(p => p.Name)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductModel.ProductResponse(
+                    p.Id,
+                    p.Sku,
+                    p.InternalCode,
+                    p.Name,
+                    p.Description,
+                    p.CurrentUnitPrice,
+                    p.StockQuantity,
+                    p.IsActive
                 )).ToList();
 
-            return result;
-
-
+            return new PagedModel.PagedResponse<ProductModel.ProductResponse>(
+                pageNumber,
+                pageSize,
+                total,
+                pagedProducts
+        );
         }
 
         public async Task<ProductModel.ProductResponse?> GetProductById(Guid id)

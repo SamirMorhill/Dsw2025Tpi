@@ -1,6 +1,7 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,6 @@ namespace Dsw2025Tpi.Api.Controllers
 {
 
     [ApiController]
-    [Authorize]
     [Route("/api/products")]
     public class ProductController : Controller
     {
@@ -20,6 +20,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPost("/api/products")]
+        [Authorize(Policy = "EsAdmin")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
             try
@@ -28,21 +29,36 @@ namespace Dsw2025Tpi.Api.Controllers
 
                 return Created($"/api/products/{product.Id}", product);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest($"Error creating product: {ex.Message}");
-            } 
+            }
         }
 
         [HttpGet("/api/products")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts(
+            string? search,
+            [FromQuery(Name = "pageNumber")] int pageNumber = 1,
+            [FromQuery(Name = "pageSize")] int pageSize = 10)
         {
             try
             {
-                var products = await _productService.GetAllProducts();
 
-                if (products is null || !products.Any())
+                if (pageNumber <= 0)
+                {
+                    return BadRequest("Page number must be greater than 0.");
+                }
+
+                if (pageSize <= 0 || pageSize > 100)
+                {
+                    return BadRequest("Page size must be between 1 and 100.");
+                }
+
+                var products = await _productService.GetAllProducts(search, pageNumber, pageSize);
+
+                if (products is null || !products.Items.Any())
                 {
                     return NotFound("There aren´t products available.");
                 }
