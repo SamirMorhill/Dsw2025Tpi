@@ -119,7 +119,7 @@ public class Program
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("EsAdmin", policy =>
-                policy.RequireClaim("tipo_usuario", "SuperAdmin"));
+                policy.RequireClaim("tipo_usuario", "Admin"));
         });
 
         builder.Services.AddDomainServices(builder.Configuration);

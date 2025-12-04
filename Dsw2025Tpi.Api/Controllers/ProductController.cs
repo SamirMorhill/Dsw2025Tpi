@@ -20,7 +20,7 @@ namespace Dsw2025Tpi.Api.Controllers
         }
 
         [HttpPost("/api/products")]
-        [Authorize(Policy = "EsAdmin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel.ProductRequest request)
         {
             try
@@ -32,7 +32,7 @@ namespace Dsw2025Tpi.Api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error creating product: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
@@ -40,6 +40,8 @@ namespace Dsw2025Tpi.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts(
             string? search,
+            [FromQuery] bool? isActive,
+            [FromQuery] bool? hasStock,
             [FromQuery(Name = "pageNumber")] int pageNumber = 1,
             [FromQuery(Name = "pageSize")] int pageSize = 10)
         {
@@ -56,7 +58,7 @@ namespace Dsw2025Tpi.Api.Controllers
                     return BadRequest("Page size must be between 1 and 100.");
                 }
 
-                var products = await _productService.GetAllProducts(search, pageNumber, pageSize);
+                var products = await _productService.GetAllProducts(search, isActive, hasStock, pageNumber, pageSize);
 
                 if (products is null || !products.Items.Any())
                 {

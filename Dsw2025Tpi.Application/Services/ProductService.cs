@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Dsw2025Tpi.Application.Services
 {
@@ -21,20 +22,24 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<ProductModel.ProductResponse> CreateProduct(ProductModel.ProductRequest request)
         {
-            var productExists = await _repository.First<Product>(p => p.Sku == request.Sku);
+            var validationErrors = new Dictionary<string, string>();
 
-            if (string.IsNullOrWhiteSpace(request.Sku) || productExists is not null)
+            if (request.CurrentUnitPrice <= 0) validationErrors.Add("price", "El precio debe ser mayor a cero.");
+            if (request.StockQuantity < 0) validationErrors.Add("stock", "El stock no puede ser negativo.");
+
+            var skuExists = await _repository.First<Product>(p => p.Sku == request.Sku);
+            if (skuExists != null) validationErrors.Add("sku", "Este SKU ya está en uso.");
+
+            var codeExists = await _repository.First<Product>(p => p.InternalCode == request.InternalCode);
+            if (codeExists != null) validationErrors.Add("cui", "Este Código Único ya existe.");
+
+            var nameExists = await _repository.First<Product>(p => p.Name == request.Name);
+            if (nameExists != null) validationErrors.Add("name", "Ya existe un producto con este nombre.");
+
+            if (validationErrors.Count > 0)
             {
-                throw new BadRequestException("Invalid SKU.");
-            } else if (string.IsNullOrWhiteSpace(request.Name))
-            {
-                throw new BadRequestException("The product name can´t be null or empty.");
-            } else if (request.CurrentUnitPrice <= 0)
-            {
-                throw new BadRequestException("The product price must be greater than zero.");
-            } else if (request.StockQuantity < 0)
-            {
-                throw new BadRequestException("The stock product can't be negative.");
+                var jsonError = JsonSerializer.Serialize(validationErrors);
+                throw new BadRequestException(jsonError);
             }
 
             var product = new Product(
@@ -46,6 +51,7 @@ namespace Dsw2025Tpi.Application.Services
                         request.StockQuantity);
 
             await _repository.Add(product);
+
             return new ProductModel.ProductResponse(
                 product.Id,
                 product.Sku!,
@@ -59,6 +65,8 @@ namespace Dsw2025Tpi.Application.Services
 
         public async Task<PagedModel.PagedResponse<ProductModel.ProductResponse>?> GetAllProducts(
             string? search,
+            bool? isActive,
+            bool? hasStock,
             int pageNumber = 1,
             int pageSize = 10)
         {
@@ -67,22 +75,32 @@ namespace Dsw2025Tpi.Application.Services
                 throw new NoContentException("There aren´t products in the Data Base.");
             }
 
-            var products = await _repository.GetAll<Product>();
+            var allProducts = await _repository.GetAll<Product>();
+            var query = allProducts.AsQueryable();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(p => p.IsActive == isActive.Value);
+            }
+
+            if (hasStock.HasValue && hasStock.Value)
+            {
+                query = query.Where(p => p.StockQuantity > 0);
+            }
 
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.ToLower().Trim();
-                products = products
-                    .Where(p => p.Name.ToLower().Contains(search))
-                    .ToList();
+                query = query.Where(p => p.Name.ToLower().Contains(search));
             }
 
-            var total = products.Count();
+            var productsFiltered = query.ToList();
+            var total = productsFiltered.Count();
 
             if (total == 0)
                 return null;
 
-            var pagedProducts = products
+            var pagedProducts = productsFiltered
                 .OrderBy(p => p.Name)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

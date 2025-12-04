@@ -69,6 +69,9 @@ namespace Dsw2025Tpi.Application.Services
                 if (product == null)
                     throw new BadRequestException($"Product {item.ProductId} not found");
 
+                if (!product.IsActive)
+                    throw new BadRequestException($"El producto '{product.Name}' ya no está disponible.");
+
                 if (product.StockQuantity < item.Quantity)
                     throw new BadRequestException($"Insufficient stock for the product {product.Name}");
 
@@ -87,6 +90,12 @@ namespace Dsw2025Tpi.Application.Services
                 });
 
                 product.StockQuantity -= item.Quantity;
+
+                if (product.StockQuantity <= 0)
+                {
+                    product.StockQuantity = 0;
+                    product.IsActive = false; 
+                }
                 await _repository.Update(product);
             }
 
